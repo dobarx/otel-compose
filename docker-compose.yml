@@ -1,0 +1,62 @@
+version: '3.9'
+networks:
+  otel:
+volumes:
+  db:
+    driver: otel
+services:
+  prometheus:
+    image: prom/prometheus:v2.51.2
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus-data:/prometheus
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
+    networks:
+      - otel
+    ports:
+      - "9090:9090"
+
+  tempo:
+    image: grafana/tempo:2.4.1
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./tempo.yml:/etc/tempo.yaml:ro
+      - ./tempo-data:/var/tempo
+    networks:
+      - otel
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib
+    volumes:
+      - ./otel-collector-config.yml:/etc/otelcol-contrib/config.yaml:ro
+    ports:
+      - 1888:1888 # pprof extension
+      - 8888:8888 # Prometheus metrics exposed by the Collector
+      - 8889:8889 # Prometheus exporter metrics
+      - 13133:13133 # health_check extension
+      - 4317:4317 # OTLP gRPC receiver
+      - 4318:4318 # OTLP http receiver
+      - 55679:55679 # zpages extension
+    networks:
+      - otel
+  loki:
+    image: grafana/loki:3.0.0
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki-data:/loki
+    networks:
+      - otel
+
+  grafana:
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    image: grafana/grafana:10.4.2
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./datasources.yml:/etc/grafana/provisioning/datasources/ds.yaml:ro
+    networks:
+      - otel
