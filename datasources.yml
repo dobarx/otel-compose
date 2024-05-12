@@ -13,11 +13,9 @@ datasources:
     tracesToLogsV2:
       customQuery: true
       datasourceUid: loki
-      spanStartTimeShift: '-1h'
-      spanEndTimeShift: '+1h'
       filterBySpanID: true
       filterByTraceID: true
-      query: '{job="fabric"} | json | traceid = "$${__trace.traceId}"'
+      query: '{job="fabric"} | json | traceid = "$${__trace.traceId}" | spanid = "$${__span.spanId}"'
 - name: Loki
   type: loki
   access: proxy 
