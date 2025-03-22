@@ -8,5 +8,5 @@ stop:
     docker-compose stop
 
 clean:
-    rm -rf ./*-data
     docker-compose down
+    rm -rf ./*-data

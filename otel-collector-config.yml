@@ -6,13 +6,10 @@ receivers:
       grpc:
         endpoint: 0.0.0.0:4317
 exporters:
-  loki:
-    endpoint: http://loki:3100/loki/api/v1/push
+  otlphttp:
+    endpoint: http://loki:3100/otlp
     tls:
       insecure: true
-    default_labels_enabled:
-      exporter: false
-      job: true
   prometheus:
     endpoint: 0.0.0.0:9090
   otlp:
@@ -30,7 +27,7 @@ service:
     logs:
       receivers: [otlp]
       processors: [batch]
-      exporters: [loki]
+      exporters: [otlphttp]
     traces:
       receivers: [otlp]
       processors: [batch]

@@ -15,7 +15,7 @@ datasources:
       datasourceUid: loki
       filterBySpanID: true
       filterByTraceID: true
-      query: '{job="fabric"} | json | traceid = "$${__trace.traceId}" | spanid = "$${__span.spanId}"'
+      query: '{service_name="fabric"} | trace_id = "$${__trace.trace_id}" | spanid = "$${__span.span_id}"'
 - name: Loki
   type: loki
   access: proxy 
@@ -30,8 +30,8 @@ datasources:
     maxLines: 1000
     derivedFields:
       - datasourceUid: tempo
-        matcherRegex: '"traceid":"([a-z0-9]+)"'
-        name: traceid
+        matcherRegex: '"trace_id":"([a-z0-9]+)"'
+        name: trace_id
         url: '$${__value.raw}'
         urlDisplayLabel: 'View Trace'
 - name: Prometheus

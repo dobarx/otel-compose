@@ -25,7 +25,7 @@ services:
     networks:
       - otel
   otel-collector:
-    image: otel/opentelemetry-collector-contrib
+    image: otel/opentelemetry-collector-contrib:latest
     volumes:
       - ./otel-collector-config.yml:/etc/otelcol-contrib/config.yaml:ro
     ports:
